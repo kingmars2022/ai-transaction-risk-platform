@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Transaction Risk Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Risk Scoring Workflow</p>
+          <h1>AI Transaction Risk Platform</h1>
+        </div>
+        <a class="docs-link" href="/api/v1/openapi.json">OpenAPI</a>
+      </header>
+
+      <section class="workflow-grid">
+        <article class="panel input-panel">
+          <div class="panel-header">
+            <h2>Submit Transaction</h2>
+          </div>
+          <form id="transaction-form" class="transaction-form">
+            <label>
+              <span>Amount</span>
+              <input name="amount" type="number" min="0" step="0.01" value="1500.00" required>
+            </label>
+            <label>
+              <span>Old Balance</span>
+              <input name="old_balance" type="number" min="0" step="0.01" value="1600.00" required>
+            </label>
+            <label>
+              <span>New Balance</span>
+              <input name="new_balance" type="number" min="0" step="0.01" value="100.00" required>
+            </label>
+            <label>
+              <span>Transaction Type</span>
+              <select name="transaction_type" required>
+                <option value="PAYMENT">PAYMENT</option>
+                <option value="TRANSFER">TRANSFER</option>
+                <option value="CASH_OUT" selected>CASH_OUT</option>
+                <option value="DEBIT">DEBIT</option>
+                <option value="CASH_IN">CASH_IN</option>
+              </select>
+            </label>
+            <label>
+              <span>Hour</span>
+              <input name="hour" type="number" min="0" max="23" step="1" value="1" required>
+            </label>
+            <div class="form-actions">
+              <button type="submit" data-mode="sync">Run Prediction</button>
+              <button type="button" data-mode="async" id="queue-job-button">Queue Async Job</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="panel result-panel">
+          <div class="panel-header">
+            <h2>Prediction Output</h2>
+          </div>
+          <div id="result-box" class="result-box empty">
+            <span class="result-label">Waiting for transaction input</span>
+            <strong>No prediction yet</strong>
+            <p>Submit a transaction to calculate risk and persist the result.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="metrics" aria-label="Risk metrics">
+        <article class="metric">
+          <span class="metric-label">Predictions</span>
+          <strong id="prediction-count">0</strong>
+        </article>
+        <article class="metric">
+          <span class="metric-label">High Risk</span>
+          <strong id="high-risk-count">0</strong>
+        </article>
+        <article class="metric">
+          <span class="metric-label">Average Risk</span>
+          <strong id="average-risk-score">0.000</strong>
+        </article>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="panel">
+          <div class="panel-header">
+            <h2>Risk Distribution</h2>
+          </div>
+          <div id="risk-chart" class="risk-chart" aria-label="Risk distribution chart"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <h2>Job Status</h2>
+          </div>
+          <div id="job-status-list" class="status-list"></div>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Recent Predictions</h2>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Hour</th>
+                <th>Risk Score</th>
+                <th>Flag</th>
+              </tr>
+            </thead>
+            <tbody id="prediction-rows"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+  </body>
+</html>

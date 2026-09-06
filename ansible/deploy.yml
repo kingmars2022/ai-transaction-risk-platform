@@ -1,0 +1,40 @@
+---
+- name: Deploy AI Transaction Risk Platform
+  hosts: app_servers
+  become: true
+
+  vars:
+    app_dir: /opt/ai-transaction-risk-platform
+
+  tasks:
+    - name: Install Docker, Compose, and Git
+      ansible.builtin.apt:
+        name:
+          - docker.io
+          - docker-compose-v2
+          - git
+        state: present
+        update_cache: true
+
+    - name: Ensure Docker service is running
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Create application directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Copy project files
+      ansible.builtin.copy:
+        src: ../
+        dest: "{{ app_dir }}/"
+        mode: preserve
+
+    - name: Start application stack
+      ansible.builtin.command:
+        cmd: docker compose up -d --build
+        chdir: "{{ app_dir }}"
